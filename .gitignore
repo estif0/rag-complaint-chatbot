@@ -218,3 +218,4 @@ __marimo__/
 # Additional directories to ignore
 data/
 docs/local/
+copilot-instructions.md
