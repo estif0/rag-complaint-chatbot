@@ -1,0 +1,36 @@
+# Core Data Science
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+
+# NLP & Embeddings
+nltk
+sentence-transformers
+transformers
+langchain
+langchain-community
+
+# Vector Databases
+chromadb
+faiss-cpu
+pypdf
+
+# Web Framework
+gradio
+
+# Utilities
+python-dotenv
+tqdm
+jupyter
+ipykernel
+
+# Testing
+pytest
+pytest-cov
+
+# Code quality
+black
+flake8
+pre-commit
