@@ -7,10 +7,6 @@ seaborn
 
 # NLP & Embeddings
 nltk
-sentence-transformers
-transformers
-langchain
-langchain-community
 
 # Vector Databases
 chromadb
