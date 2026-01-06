@@ -115,6 +115,91 @@ stats = chunker.get_chunk_statistics(chunks_df)
 print(f"Created {stats['total_chunks']} chunks from {stats['num_documents']} documents")
 ```
 
+## Embedding Module
+
+### EmbeddingGenerator (`embedder.py`)
+
+Generates vector embeddings for text using sentence-transformers models.
+
+**Key Methods:**
+- `load_model()` - Load sentence-transformers model
+- `generate_embedding(text)` - Generate embedding for single or multiple texts
+- `batch_embed(texts, batch_size)` - Efficient batch embedding generation
+- `embed_dataframe(df, text_column, batch_size)` - Embed texts from DataFrame
+
+**Usage:**
+```python
+from src.embedder import EmbeddingGenerator
+
+# Initialize with model
+embedder = EmbeddingGenerator(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
+# Single text
+embedding = embedder.generate_embedding("Credit card fees are too high")
+print(f"Embedding shape: {embedding.shape}")  # (384,)
+
+# Batch processing
+texts = ["Text 1", "Text 2", "Text 3"]
+embeddings = embedder.batch_embed(texts, batch_size=32, show_progress_bar=True)
+print(f"Embeddings shape: {embeddings.shape}")  # (3, 384)
+```
+
+## Vector Store Module
+
+### VectorStoreManager (`vector_store.py`)
+
+Manages ChromaDB vector store for semantic search over embeddings.
+
+**Key Methods:**
+- `add_embeddings(embeddings, documents, metadatas, ids)` - Add embeddings to store
+- `search(query_embedding, top_k, filter_dict)` - Similarity search
+- `add_documents_batch(chunks_df, embeddings)` - Batch add from DataFrame
+- `get_collection_stats()` - Get collection statistics
+- `delete_collection()` - Delete collection
+
+**Usage:**
+```python
+from src.vector_store import VectorStoreManager
+
+# Initialize
+vector_store = VectorStoreManager(
+    persist_directory="vector_store",
+    collection_name="complaints",
+    reset=False
+)
+
+# Add embeddings
+vector_store.add_embeddings(
+    embeddings=embeddings,
+    documents=texts,
+    metadatas=[{'product': 'Credit card', 'id': '1'}],
+    ids=['doc_1']
+)
+
+# Search
+query_embedding = embedder.generate_embedding("late fees")
+results = vector_store.search(query_embedding, top_k=5)
+
+print(f"Found {len(results['documents'])} similar documents")
+for doc, metadata, distance in zip(
+    results['documents'], 
+    results['metadatas'], 
+    results['distances']
+):
+    print(f"Distance: {distance:.4f}")
+    print(f"Product: {metadata['product']}")
+    print(f"Text: {doc[:100]}...")
+
+# Batch add from DataFrame
+vector_store.add_documents_batch(
+    chunks_df=chunks_df,
+    embeddings=embeddings,
+    text_column='text',
+    metadata_columns=['Product', 'ID'],
+    batch_size=1000
+)
+```
+
 ## Design Principles
 
 - **Single Responsibility**: Each class has one clear purpose

@@ -11,9 +11,9 @@ from pathlib import Path
 import sys
 
 # Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+sys.path.append(str(Path.cwd().parent))
 
-from data_sampler import StratifiedSampler
+from src.data_sampler import StratifiedSampler
 
 
 class TestStratifiedSampler:
