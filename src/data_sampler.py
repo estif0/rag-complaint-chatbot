@@ -81,10 +81,7 @@ class StratifiedSampler:
         # Perform stratified sampling
         sampled_df = (
             self.df.groupby(self.product_column, group_keys=False)
-            .apply(
-                lambda x: x.sample(frac=frac, random_state=random_state),
-                include_groups=True,
-            )
+            .apply(lambda x: x.sample(frac=frac, random_state=random_state))
             .reset_index(drop=True)
         )
 
