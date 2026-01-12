@@ -150,8 +150,9 @@ class VectorStoreManager:
             raise ValueError("Number of IDs must match number of documents")
 
         # Prepare metadatas if not provided
+        # ChromaDB requires non-empty metadata dicts
         if metadatas is None:
-            metadatas = [{} for _ in range(len(documents))]
+            metadatas = [{"doc_index": str(i)} for i in range(len(documents))]
 
         if len(metadatas) != len(documents):
             raise ValueError("Number of metadatas must match number of documents")
