@@ -200,6 +200,186 @@ vector_store.add_documents_batch(
 )
 ```
 
+## RAG Pipeline Modules (Task 3)
+
+### DocumentRetriever (`retriever.py`)
+
+Retrieves relevant documents from the vector store using semantic similarity search.
+
+**Key Methods:**
+- `load_vector_store()` - Load pre-built ChromaDB vector store
+- `embed_query(query)` - Generate embedding for user query
+- `retrieve(query, top_k, filter_dict)` - Search for top-k similar documents
+- `get_context_string(results)` - Format results as context string
+
+**Usage:**
+```python
+from src.retriever import DocumentRetriever
+
+# Initialize retriever
+retriever = DocumentRetriever(
+    vector_store_path="vector_store",
+    embedding_model_name="sentence-transformers/all-MiniLM-L6-v2",
+    top_k=5
+)
+
+# Retrieve relevant documents
+query = "What are common credit card issues?"
+results = retriever.retrieve(query, top_k=5)
+
+# Access results
+for result in results:
+    print(f"Similarity: {result['similarity']:.4f}")
+    print(f"Text: {result['text']}")
+    print(f"Metadata: {result['metadata']}")
+```
+
+### PromptBuilder (`prompt_builder.py`)
+
+Constructs prompts for the LLM using templates and retrieved context.
+
+**Key Methods:**
+- `format_context(results, include_metadata)` - Format retrieved chunks
+- `build_rag_prompt(question, context, template_name)` - Build complete prompt
+- `build_prompt_from_results(question, results)` - Direct integration with retriever
+- `add_custom_template(name, template)` - Add custom prompt template
+
+**Templates:**
+- `default` - Standard analytical assistant
+- `concise` - Brief, focused responses
+- `detailed` - Comprehensive analysis
+- `comparative` - Compare across products
+
+**Usage:**
+```python
+from src.prompt_builder import PromptBuilder
+
+# Initialize
+prompt_builder = PromptBuilder()
+
+# Format context from retrieval results
+context = prompt_builder.format_context(results, include_metadata=True)
+
+# Build prompt
+prompt = prompt_builder.build_rag_prompt(
+    question="What are the main credit card issues?",
+    context=context,
+    template_name="default"
+)
+
+# Or build directly from retrieval results
+prompt = prompt_builder.build_prompt_from_results(
+    question="What are the main credit card issues?",
+    results=results
+)
+```
+
+### ResponseGenerator (`generator.py`)
+
+Generates responses using Large Language Models (LLMs).
+
+**Key Methods:**
+- `load_llm(model_name, **kwargs)` - Load HuggingFace model
+- `generate(prompt, **kwargs)` - Generate response from prompt
+- `generate_streaming(prompt, **kwargs)` - Stream tokens as they're generated
+- `update_generation_config(**kwargs)` - Update generation parameters
+
+**Usage:**
+```python
+from src.generator import ResponseGenerator
+
+# Initialize with model
+generator = ResponseGenerator(
+    model_name="google/flan-t5-base",  # or "mistralai/Mistral-7B-Instruct-v0.1"
+    max_new_tokens=200,
+    temperature=0.7
+)
+
+# Generate response
+response = generator.generate(prompt)
+print(response)
+
+# Streaming generation
+for token in generator.generate_streaming(prompt):
+    print(token, end='', flush=True)
+```
+
+### RAGPipeline (`rag_pipeline.py`)
+
+Complete RAG pipeline integrating retrieval, prompt building, and generation.
+
+**Key Methods:**
+- `initialize()` - Set up all pipeline components
+- `query(question, top_k, template_name)` - End-to-end RAG query
+- `query_streaming(question, **kwargs)` - Streaming RAG query
+- `get_sources()` - Retrieve source documents
+- `get_formatted_sources()` - Format sources for display
+
+**Usage:**
+```python
+from src.rag_pipeline import RAGPipeline
+
+# Initialize pipeline
+rag = RAGPipeline(
+    vector_store_path="vector_store",
+    embedding_model_name="sentence-transformers/all-MiniLM-L6-v2",
+    llm_model_name="google/flan-t5-base",
+    top_k=5,
+    temperature=0.7,
+    max_new_tokens=200
+)
+
+# Query the system
+result = rag.query("What are common credit card issues?")
+print(f"Answer: {result['answer']}")
+print(f"Sources: {len(result['sources'])} documents retrieved")
+
+# Access sources
+for source in result['sources']:
+    print(f"Product: {source['metadata']['product']}")
+    print(f"Text: {source['text'][:100]}...")
+
+# Streaming query
+for token in rag.query_streaming("What issues do customers face with loans?"):
+    print(token, end='', flush=True)
+```
+
+### RAGEvaluator (`evaluator.py`)
+
+Evaluates RAG system quality with test questions and metrics.
+
+**Key Methods:**
+- `create_test_questions(categories)` - Generate evaluation questions
+- `evaluate_response(question, answer, sources)` - Assess response quality
+- `run_evaluation(questions, save_path)` - Batch evaluate multiple questions
+- `generate_report(results)` - Create evaluation report DataFrame
+- `calculate_metrics(results)` - Compute aggregate metrics
+
+**Usage:**
+```python
+from src.evaluator import RAGEvaluator
+
+# Initialize
+evaluator = RAGEvaluator(rag_pipeline)
+
+# Create test questions
+questions = evaluator.create_test_questions(categories=[
+    'credit_card', 'personal_loan', 'savings_account', 'money_transfer'
+])
+
+# Run evaluation
+results = evaluator.run_evaluation(questions, save_path="evaluation_results.json")
+
+# Generate report
+report_df = evaluator.generate_report(results)
+print(report_df)
+
+# Calculate metrics
+metrics = evaluator.calculate_metrics(results)
+print(f"Average Score: {metrics['average_score']:.2f}")
+print(f"Relevance: {metrics['avg_relevance']:.2f}")
+```
+
 ## Design Principles
 
 - **Single Responsibility**: Each class has one clear purpose
