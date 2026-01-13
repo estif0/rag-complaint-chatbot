@@ -162,6 +162,25 @@ for doc, metadata, distance in zip(
     print("-" * 80)
 ```
 
+#### 4. Launch Interactive Chat Interface (Task 4)
+```bash
+# Run the Gradio application
+python app.py
+```
+
+The app will start on `http://localhost:7860`. Features include:
+- 💬 Natural language question input
+- 🤖 AI-generated answers based on retrieved complaints
+- 📄 Source document display with metadata
+- 🗑️ Clear conversation button
+- ✅ Real-time system status
+
+**Example questions to try:**
+- "What are the main complaints about credit cards?"
+- "Why are customers unhappy with personal loans?"
+- "What issues do people report with money transfers?"
+- "Compare complaint trends across different products"
+
 ## 🧪 Testing
 
 Run all tests:
@@ -205,17 +224,19 @@ pytest tests/ --cov=src --cov-report=html
 ### 🔄 In Progress
 
 **Task 3: RAG Core Logic and Evaluation**
-- [ ] Retriever module
-- [ ] Prompt engineering
-- [ ] LLM integration
-- [ ] RAG pipeline
-- [ ] Evaluation framework
+- [x] Retriever module
+- [x] Prompt engineering
+- [x] LLM integration
+- [x] RAG pipeline
+- [x] Evaluation framework
 
 **Task 4: Interactive Chat Interface**
-- [ ] Gradio UI
-- [ ] Source display
-- [ ] Chat history
-- [ ] Clear functionality
+- [x] Gradio UI with chat interface
+- [x] Source display with metadata
+- [x] Chat history management
+- [x] Clear functionality
+- [x] System status display
+- [x] Error handling
 
 ## 🏗️ Architecture
 
@@ -356,6 +377,6 @@ This project is for educational purposes as part of the 10Academy AI Mastery pro
 
 ---
 
-**Last Updated**: January 6, 2026  
-**Project Status**: Task 2 Complete (Vector Store Ready)  
-**Next Milestone**: Task 3 - RAG Pipeline Implementation
+**Last Updated**: January 13, 2026  
+**Project Status**: Task 4 Complete (Interactive Chat Interface Ready)  
+**Next Milestone**: Final Submission & Demo
